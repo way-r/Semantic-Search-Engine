@@ -1,0 +1,9 @@
+fastapi==0.122.0
+uvicorn==0.38.0
+numpy==2.3.5
+onnx==1.19.1
+onnxruntime==1.23.2
+optimum==2.0.0
+optimum-onnx==0.0.3
+transformers==4.55.4
+python-dotenv==1.2.1
