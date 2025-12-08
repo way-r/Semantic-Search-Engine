@@ -1,4 +1,4 @@
-package com.gateway.application.entry;
+package com.gateway.application.embed;
 
 import org.springframework.stereotype.Service;
 
