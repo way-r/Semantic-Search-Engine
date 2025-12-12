@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from src import embed_pb2 as src_dot_embed__pb2
+import src.embed_pb2 as embed__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in src/embed_pb2_grpc.py depends on'
+        + ' but the generated code in embed_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,8 +36,8 @@ class EmbedServiceStub(object):
         """
         self.GetEmbed = channel.unary_unary(
                 '/embed.EmbedService/GetEmbed',
-                request_serializer=src_dot_embed__pb2.EmbedRequest.SerializeToString,
-                response_deserializer=src_dot_embed__pb2.EmbedResponse.FromString,
+                request_serializer=embed__pb2.EmbedRequest.SerializeToString,
+                response_deserializer=embed__pb2.EmbedResponse.FromString,
                 _registered_method=True)
 
 
@@ -55,8 +55,8 @@ def add_EmbedServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetEmbed': grpc.unary_unary_rpc_method_handler(
                     servicer.GetEmbed,
-                    request_deserializer=src_dot_embed__pb2.EmbedRequest.FromString,
-                    response_serializer=src_dot_embed__pb2.EmbedResponse.SerializeToString,
+                    request_deserializer=embed__pb2.EmbedRequest.FromString,
+                    response_serializer=embed__pb2.EmbedResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -84,8 +84,8 @@ class EmbedService(object):
             request,
             target,
             '/embed.EmbedService/GetEmbed',
-            src_dot_embed__pb2.EmbedRequest.SerializeToString,
-            src_dot_embed__pb2.EmbedResponse.FromString,
+            embed__pb2.EmbedRequest.SerializeToString,
+            embed__pb2.EmbedResponse.FromString,
             options,
             channel_credentials,
             insecure,

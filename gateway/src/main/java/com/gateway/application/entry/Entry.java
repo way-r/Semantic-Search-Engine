@@ -17,10 +17,10 @@ public class Entry {
     
     @Id UUID id;
 
-    @NotEmpty String arxiv_id;
-    @NotEmpty String title;
-    @NotEmpty String doi;
-    @NotEmpty String abstract_content;
+    String arxiv_id;
+    String title;
+    String doi;
+    String abstract_content;
     String submittor;
     List<String> authors;
     List<String> categories;
@@ -48,7 +48,7 @@ public class Entry {
         this.completed = completed;
     }
 
-    public String get_abstract_content() {
+    public String get_content() {
         return this.abstract_content;
     }
 

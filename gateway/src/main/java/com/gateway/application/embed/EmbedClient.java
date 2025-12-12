@@ -12,10 +12,10 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 public class EmbedClient {
 
     @GrpcClient("embedService")
-    private EmbedServiceGrpc.EmbedServiceBlockingStub embedServiceBlockingStub;
+    private EmbedServiceGrpc.EmbedServiceBlockingStub stub;
 
-    public EmbedResponse GetEmbed(String text) {
+    public EmbedResponse getEmbedResponse(String text) {
         EmbedRequest embedRequest = EmbedRequest.newBuilder().setText(text).build();
-        return embedServiceBlockingStub.getEmbed(embedRequest);
+        return stub.getEmbed(embedRequest);
     }
 }

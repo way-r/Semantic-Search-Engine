@@ -34,6 +34,10 @@ def embed_text(text):
         ort_inputs["token_type_ids"] = encoded_text["token_type_ids"].astype(np.int64)
     
     output = session.run(None, ort_inputs)
-    embedding = mean_pooling(output, ort_inputs["attention_mask"])
+    embedding = mean_pooling(output, ort_inputs["attention_mask"])[0]
+    
+    magnitude = np.linalg.norm(embedding)
+    if magnitude > 0:
+        embedding = embedding / magnitude
 
-    return embedding[0].tolist()
+    return embedding.tolist()

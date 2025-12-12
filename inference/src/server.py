@@ -1,6 +1,5 @@
 from concurrent import futures
 from src.embed import embed_text
-from datetime import datetime, timezone
 import src.embed_pb2_grpc
 import src.embed_pb2
 import grpc
@@ -10,10 +9,10 @@ class EmbedServicer(src.embed_pb2_grpc.EmbedServiceServicer):
         try:
             embed = embed_text(request.text)
 
-            return src.embed_pb2.EmbedResponse(status = 1, embed = src.embed_pb2.EmbedValue(values = embed))
+            return src.embed_pb2.EmbedResponse(status = 0, embed = src.embed_pb2.EmbedValue(values = embed))
 
         except ValueError as e:
-            return src.embed_pb2.EmbedResponse(status = 2, error = str(e))
+            return src.embed_pb2.EmbedResponse(status = 1, error = str(e))
     
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

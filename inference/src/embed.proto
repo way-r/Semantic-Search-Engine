@@ -1,6 +1,9 @@
 syntax = "proto3";
 
 package embed;
+option java_multiple_files = true;
+option java_package = "embed.proto";
+option java_outer_classname = "EmbedProto";
 
 service EmbedService {
     rpc GetEmbed(EmbedRequest) returns (EmbedResponse);
@@ -12,9 +15,8 @@ message EmbedRequest {
 
 message EmbedResponse {
     enum Status {
-        INCOMPLETE=0;
-        COMPLETE=1;
-        FAILED=2;
+        SUCCESS=0;
+        FAILED=1;
     }
     Status status = 1;
     oneof payload {

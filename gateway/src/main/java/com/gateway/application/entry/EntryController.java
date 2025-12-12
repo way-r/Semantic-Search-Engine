@@ -1,9 +1,12 @@
 package com.gateway.application.entry;
 
-import java.util.List;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Map;
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,9 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gateway.application.embed.EmbedClient;
-import com.gateway.application.embed.EmbedStore;
+import com.gateway.application.utils.VectorUtils;
 
 import embed.proto.EmbedResponse;
+import redis.clients.jedis.JedisPooled;
 
 @RestController
 @RequestMapping("/api/entry")
@@ -21,12 +25,13 @@ public class EntryController {
 
     private final EntryRepository entryRepository;
     private final EmbedClient embedClient;
-    private final EmbedStore embedStore;
+    private final JedisPooled jedisPooled;
+    private static final Logger log = LoggerFactory.getLogger(EntryController.class);
 
-    public EntryController(EntryRepository entryRepository, EmbedClient embedClient, EmbedStore embedStore) {
+    public EntryController(EntryRepository entryRepository, EmbedClient embedClient, JedisPooled jedisPooled) {
         this.entryRepository = entryRepository;
         this.embedClient = embedClient;
-        this.embedStore = embedStore;
+        this.jedisPooled = jedisPooled;
     }
 
     @PostMapping("")
@@ -46,20 +51,48 @@ public class EntryController {
             LocalDateTime.now(),
             null
         );
-        entryRepository.save(newEntry);
-
-        EmbedResponse embedResponse = embedClient.GetEmbed(newEntry.get_abstract_content());
-        if (embedResponse.getStatus() == EmbedResponse.Status.FAILED) {
-            newEntry.set_embed_status("FAILED");
+        try {
+            entryRepository.save(newEntry);
         }
-        else {
-            newEntry.set_embed_status("Completed");
-            newEntry.set_completed(LocalDateTime.now(ZoneId.of("UTC")));
-            
-            List<Float> vectorEmbedding = embedResponse.getEmbed().getValuesList();
-            embedStore.saveEmbed(uuid, vectorEmbedding);
+        catch (Exception e) {
+            log.error("Failed to save incompleted entry to Postgres" + e.toString());
+            return;
         }
+        
+        try {
+            EmbedResponse embedResponse = embedClient.getEmbedResponse(newEntry.get_content());
 
-        entryRepository.save(newEntry);
+            if (embedResponse.getStatus() == EmbedResponse.Status.FAILED) {
+                newEntry.set_embed_status("FAILED");
+                log.error("Embed client responded with a failed result");
+            }
+            else {
+                byte[] entryEmbed = VectorUtils.standardizeEmbed(embedResponse.getEmbed().getValuesList());
+                String entry_id = "uuid:" + uuid.toString();
+
+                try {
+                    this.jedisPooled.hset(
+                        entry_id.getBytes(),
+                        Map.of("embed".getBytes(), entryEmbed, "uuid".getBytes(), entry_id.getBytes())
+                    );
+                }
+                catch (Exception e) {
+                    log.error("Failed to save embed to redis");
+                }
+                
+                newEntry.set_embed_status("COMPLETE");
+                newEntry.set_completed(LocalDateTime.now(ZoneId.of("UTC")));
+
+                try {
+                    entryRepository.save(newEntry);
+                }
+                catch (Exception e) {
+                    log.error("Failed to save completed entry to Postgres");
+                }
+            }
+        }
+        catch (Exception e) {
+            log.error("Failed to embed the entry through the embed client");
+        }
     }
 }
