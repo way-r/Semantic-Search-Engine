@@ -43,9 +43,9 @@ public class EntryController {
             entryRequest.title(),
             entryRequest.doi(),
             entryRequest.abstract_content(),
-            entryRequest.submittor(),
+            entryRequest.submitter(),
             entryRequest.authors(),
-            entryRequest.categories(),
+            entryRequest.category(),
             entryRequest.publish_date(),
             "INCOMPLETE",
             LocalDateTime.now(),
@@ -60,10 +60,10 @@ public class EntryController {
         }
         
         try {
-            EmbedResponse embedResponse = embedClient.getEmbedResponse(newEntry.get_content());
+            EmbedResponse embedResponse = embedClient.getEmbedResponse(newEntry.getAbstract_content());
 
             if (embedResponse.getStatus() == EmbedResponse.Status.FAILED) {
-                newEntry.set_embed_status("FAILED");
+                newEntry.markFailed();
                 log.error("Embed client responded with a failed result");
             }
             else {
@@ -80,8 +80,7 @@ public class EntryController {
                     log.error("Failed to save embed to redis");
                 }
                 
-                newEntry.set_embed_status("COMPLETE");
-                newEntry.set_completed(LocalDateTime.now(ZoneId.of("UTC")));
+                newEntry.markComplete(LocalDateTime.now(ZoneId.of("UTC")));
 
                 try {
                     entryRepository.save(newEntry);

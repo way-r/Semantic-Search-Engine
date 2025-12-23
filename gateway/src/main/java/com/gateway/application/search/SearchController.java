@@ -1,5 +1,8 @@
 package com.gateway.application.search;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gateway.application.embed.EmbedClient;
+import com.gateway.application.entry.Entry;
+import com.gateway.application.entry.EntryRepository;
 import com.gateway.application.utils.VectorUtils;
 
 import embed.proto.EmbedResponse;
@@ -25,11 +30,13 @@ public class SearchController {
 
     private final EmbedClient embedClient;
     private final JedisPooled jedisPooled;
+    private final EntryRepository entryRepository;
     private final Logger log = LoggerFactory.getLogger(SearchController.class);
 
-    public SearchController(EmbedClient embedClient, JedisPooled jedisPooled) {
+    public SearchController(EmbedClient embedClient, JedisPooled jedisPooled, EntryRepository entryRepository) {
         this.embedClient = embedClient;
         this.jedisPooled = jedisPooled;
+        this.entryRepository = entryRepository;
     }
 
     @PostMapping("")
@@ -56,7 +63,12 @@ public class SearchController {
                     SearchResult searchResult = this.jedisPooled.ftSearch("docs", query);
 
                     for (Document doc : searchResult.getDocuments()) {
-                        searchOutcome.addResult((String) doc.get("uuid"), Float.parseFloat((String) doc.get("score")));
+                        UUID docID = UUID.fromString(((String) doc.get("uuid")).substring(5));
+                        Float score = Float.parseFloat((String) doc.get("score"));
+
+                        Optional<Entry> entrySearch = findEntry(docID);
+                        Entry entry = entrySearch.orElseThrow();
+                        searchOutcome.addResult(entry, score);
                     }
                     return ResponseEntity.ok(searchOutcome);
 
@@ -67,8 +79,12 @@ public class SearchController {
             }
         }
         catch (Exception e) {
-            log.error("Failed to embed the search through the embed client");
+            log.error("Failed to embed the search through the embed client!" + e.toString());
         }
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+    }
+
+    Optional<Entry> findEntry(UUID id) {
+        return this.entryRepository.findById(id);
     }
 }

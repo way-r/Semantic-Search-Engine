@@ -1,11 +1,14 @@
 from concurrent import futures
 from src.embed import embed_text
+from dotenv import load_dotenv
 import src.embed_pb2_grpc
 import src.embed_pb2
-import grpc
+import grpc, os
+
+inference_port = os.getenv("INFERENCE_PORT", 50050)
 
 class EmbedServicer(src.embed_pb2_grpc.EmbedServiceServicer):
-    def GetEmbed(self, request, context):
+    def GetEmbed(self, request, _):
         try:
             embed = embed_text(request.text)
 
@@ -17,8 +20,7 @@ class EmbedServicer(src.embed_pb2_grpc.EmbedServiceServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     src.embed_pb2_grpc.add_EmbedServiceServicer_to_server(EmbedServicer(), server)
-    server.add_insecure_port("localhost:50051")
-    print("Server running on port 50051")
+    server.add_insecure_port(f"[::]:{inference_port}")
     server.start()
     server.wait_for_termination()
 

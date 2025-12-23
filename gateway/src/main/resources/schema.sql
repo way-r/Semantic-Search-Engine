@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS Entries (
     title TEXT NOT NULL,
     doi TEXT,
     abstract_content TEXT,
-    submittor TEXT,
+    submitter TEXT,
     authors TEXT[],
-    categories TEXT[],
+    category TEXT,
     publish_date DATE,
     
     embed_status TEXT NOT NULL,

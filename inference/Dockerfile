@@ -1,15 +1,13 @@
 FROM python:3.13-slim
 
-WORKDIR /app
+WORKDIR /inference
 
-COPY requirements.txt /app/requirements.txt
+COPY requirements.txt /inference/requirements.txt
 
 RUN pip install -r requirements.txt
 
-COPY models/ /app/models/
+COPY models/ /inference/models/
 
-COPY src/ /app/src/
+COPY src/ /inference/src/
 
-EXPOSE 8000
-
-CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "src.server"]

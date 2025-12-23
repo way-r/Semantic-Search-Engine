@@ -10,8 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "Entries")
 public class Entry {
     
@@ -21,9 +23,9 @@ public class Entry {
     String title;
     String doi;
     String abstract_content;
-    String submittor;
+    String submitter;
+    String category;
     List<String> authors;
-    List<String> categories;
     LocalDate publish_date;
 
     @NotEmpty String embed_status;
@@ -33,30 +35,27 @@ public class Entry {
     public Entry() {
     }
 
-    public Entry(UUID id, String arxiv_id, String title, String doi, String abstract_content, String submittor, List<String> authors, List<String> categories, LocalDate publish_date, String embed_status, LocalDateTime uploaded, LocalDateTime completed) {
+    public Entry(UUID id, String arxiv_id, String title, String doi, String abstract_content, String submitter, List<String> authors, String category, LocalDate publish_date, String embed_status, LocalDateTime uploaded, LocalDateTime completed) {
         this.id = id;
         this.arxiv_id = arxiv_id;
         this.title = title;
         this.doi = doi;
         this.abstract_content = abstract_content;
-        this.submittor = submittor;
+        this.submitter = submitter;
         this.authors = authors;
-        this.categories = categories;
+        this.category = category;
         this.publish_date = publish_date;
         this.embed_status = embed_status;
         this.uploaded = uploaded;
         this.completed = completed;
     }
 
-    public String get_content() {
-        return this.abstract_content;
-    }
-
-    public void set_embed_status(String status) {
-        this.embed_status = status;
-    }
-
-    public void set_completed(LocalDateTime completed_time) {
+    public void markComplete(LocalDateTime completed_time) {
+        this.embed_status = "COMPLETE";
         this.completed = completed_time;
+    }
+
+    public void markFailed() {
+        this.embed_status = "FAILED";
     }
 }
