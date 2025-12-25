@@ -1,14 +1,8 @@
-CREATE TABLE IF NOT EXISTS Entries (
-    id UUID,
+CREATE TABLE IF NOT EXISTS Entry (
+    id UUID NOT NULL,
 
-    arxiv_id TEXT NOT NULL,
-    title TEXT NOT NULL,
-    doi TEXT,
-    abstract_content TEXT,
-    submitter TEXT,
-    authors TEXT[],
-    category TEXT,
-    publish_date DATE,
+    ref TEXT,
+    content TEXT NOT NULL,
     
     embed_status TEXT NOT NULL,
     uploaded TIMESTAMP NOT NULL,

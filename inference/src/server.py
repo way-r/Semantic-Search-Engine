@@ -1,25 +1,24 @@
 from concurrent import futures
 from src.embed import embed_text
-from dotenv import load_dotenv
-import src.embed_pb2_grpc
-import src.embed_pb2
+import src.embedding_pb2_grpc as embedding_pb2_grpc
+import src.embedding_pb2 as embedding_pb2
 import grpc, os
 
-inference_port = os.getenv("INFERENCE_PORT", 50050)
+inference_port = os.getenv("INFERENCE_PORT", 50051)
 
-class EmbedServicer(src.embed_pb2_grpc.EmbedServiceServicer):
-    def GetEmbed(self, request, _):
+class EmbeddingServicer(embedding_pb2_grpc.EmbeddingServiceServicer):
+    def GetEmbedding(self, request, _):
         try:
-            embed = embed_text(request.text)
+            embedding = embed_text(request.text)
 
-            return src.embed_pb2.EmbedResponse(status = 0, embed = src.embed_pb2.EmbedValue(values = embed))
+            return embedding_pb2.EmbeddingResponse(status = 0, embedding = embedding_pb2.Embedding(values = embedding))
 
         except ValueError as e:
-            return src.embed_pb2.EmbedResponse(status = 1, error = str(e))
+            return embedding_pb2.EmbeddingResponse(status = 1, error = str(e))
     
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    src.embed_pb2_grpc.add_EmbedServiceServicer_to_server(EmbedServicer(), server)
+    embedding_pb2_grpc.add_EmbeddingServiceServicer_to_server(EmbeddingServicer(), server)
     server.add_insecure_port(f"[::]:{inference_port}")
     server.start()
     server.wait_for_termination()

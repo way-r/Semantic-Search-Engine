@@ -1,54 +1,32 @@
 package com.gateway.application.entry;
 
-import java.util.UUID;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "Entries")
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "Entry")
 public class Entry {
     
     @Id UUID id;
 
-    String arxiv_id;
-    String title;
-    String doi;
-    String abstract_content;
-    String submitter;
-    String category;
-    List<String> authors;
-    LocalDate publish_date;
+    String ref;
+    @NotEmpty String content;
 
     @NotEmpty String embed_status;
     @NotNull LocalDateTime uploaded;
     LocalDateTime completed;
-
-    public Entry() {
-    }
-
-    public Entry(UUID id, String arxiv_id, String title, String doi, String abstract_content, String submitter, List<String> authors, String category, LocalDate publish_date, String embed_status, LocalDateTime uploaded, LocalDateTime completed) {
-        this.id = id;
-        this.arxiv_id = arxiv_id;
-        this.title = title;
-        this.doi = doi;
-        this.abstract_content = abstract_content;
-        this.submitter = submitter;
-        this.authors = authors;
-        this.category = category;
-        this.publish_date = publish_date;
-        this.embed_status = embed_status;
-        this.uploaded = uploaded;
-        this.completed = completed;
-    }
 
     public void markComplete(LocalDateTime completed_time) {
         this.embed_status = "COMPLETE";

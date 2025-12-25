@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import src.embed_pb2 as embed__pb2
+import src.embedding_pb2 as embedding__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__
@@ -18,14 +18,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in embed_pb2_grpc.py depends on'
+        + ' but the generated code in embedding_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class EmbedServiceStub(object):
+class EmbeddingServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,43 +34,43 @@ class EmbedServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetEmbed = channel.unary_unary(
-                '/embed.EmbedService/GetEmbed',
-                request_serializer=embed__pb2.EmbedRequest.SerializeToString,
-                response_deserializer=embed__pb2.EmbedResponse.FromString,
+        self.GetEmbedding = channel.unary_unary(
+                '/embedding.EmbeddingService/GetEmbedding',
+                request_serializer=embedding__pb2.EmbeddingRequest.SerializeToString,
+                response_deserializer=embedding__pb2.EmbeddingResponse.FromString,
                 _registered_method=True)
 
 
-class EmbedServiceServicer(object):
+class EmbeddingServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetEmbed(self, request, context):
+    def GetEmbedding(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_EmbedServiceServicer_to_server(servicer, server):
+def add_EmbeddingServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetEmbed': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetEmbed,
-                    request_deserializer=embed__pb2.EmbedRequest.FromString,
-                    response_serializer=embed__pb2.EmbedResponse.SerializeToString,
+            'GetEmbedding': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetEmbedding,
+                    request_deserializer=embedding__pb2.EmbeddingRequest.FromString,
+                    response_serializer=embedding__pb2.EmbeddingResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'embed.EmbedService', rpc_method_handlers)
+            'embedding.EmbeddingService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('embed.EmbedService', rpc_method_handlers)
+    server.add_registered_method_handlers('embedding.EmbeddingService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class EmbedService(object):
+class EmbeddingService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetEmbed(request,
+    def GetEmbedding(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +83,9 @@ class EmbedService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/embed.EmbedService/GetEmbed',
-            embed__pb2.EmbedRequest.SerializeToString,
-            embed__pb2.EmbedResponse.FromString,
+            '/embedding.EmbeddingService/GetEmbedding',
+            embedding__pb2.EmbeddingRequest.SerializeToString,
+            embedding__pb2.EmbeddingResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -21,7 +21,7 @@ public class RedisInit {
 
     @PostConstruct
     public void indexInit() {
-        String indexName = "docs";
+        String indexName = "vector";
 
         try {
             jedisPooled.ftInfo(indexName);
@@ -30,11 +30,11 @@ public class RedisInit {
         catch (Exception e) {
             jedisPooled.ftCreate(
                 indexName,
-                IndexOptions.defaultOptions().setDefinition(new IndexDefinition(IndexDefinition.Type.HASH).setPrefixes("uuid:")),
+                IndexOptions.defaultOptions().setDefinition(new IndexDefinition(IndexDefinition.Type.HASH).setPrefixes("vector:")),
                 Schema.from(
-                    new Schema.TextField("uuid"), 
+                    new Schema.TextField("id"), 
                     new Schema.VectorField(
-                        "embed", 
+                        "embedding", 
                         Schema.VectorField.VectorAlgo.HNSW, 
                         Map.of("TYPE", "FLOAT32", "DIM", 384, "DISTANCE_METRIC", "COSINE"))
                     )

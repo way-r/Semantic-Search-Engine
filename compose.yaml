@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - SPRING_DATA_REDIS_HOST=redis
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/entries
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/entry
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASS}
       - EMBED_SERVICE_HOST=inference
@@ -28,7 +28,7 @@ services:
   postgres:
     image: postgres:16
     environment:
-      - POSTGRES_DB=entries
+      - POSTGRES_DB=entry
       - POSTGRES_PASSWORD=${POSTGRES_PASS}
       - POSTGRES_USER=${POSTGRES_USER}
     ports:
